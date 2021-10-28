@@ -19,7 +19,7 @@ This document outlines a new method for Konnect administrators to manage access 
 Today, a Konnect organization is set up as follows:
 
 #### User
-- There is a flat user list
+- There is a flat user list with linear hierarchy.
     - Each user can be assigned one or more roles
 - Each role grants the user permission to configure some resource:
     - Organization Admin: Manage all objects, users and roles in the organization.
