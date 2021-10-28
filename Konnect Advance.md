@@ -5,14 +5,14 @@ ___
 ## Today's State
 Today, a Konnect organization is set up as follows:
 
-#### Runtimes (Resource)
+#### Runtimes
 - A single **Runtime Manager** lists all runtimes configured in an organization.
 - All runtimes created within an organization are homogeneous.
 
-#### Services (Resource)
+#### Services
 - A single **Service Hub** catalog displays all services registered in an organization.
 
-#### User (Subject)
+#### User
 - There is a flat user list
     - Each user can be assigned one or more roles
 - Each role grants the user permission to configure some resource:
@@ -27,7 +27,8 @@ Today, a Konnect organization is set up as follows:
 > Enterprise organizations would like more fine grained control over what resources users in Konnect have access to and be able to manage these controls at scale.
 ___
 
-## Users -> Teams (Subject)
+## Proposal
+### Users -> Teams
 In order to manage multiple users and their permissions at scale, individual users need to be grouped into **teams**. Like users, teams can be assigned one or more permissions and all users in the team will be granted the permissions assigned to the team. 
 
 #### Team Attributes
@@ -46,7 +47,7 @@ Furthermore, since enterprise Konnect users may already belong to functional tea
 ```
 TBD: If a user is in multiple teams, is it possible there might be a permission conflict?
 
-## Runtimes -> Runtime Groups (Resource)
+### Runtimes -> Runtime Groups
 In order to gain fine grained control of runtime management access, runtimes need to be classified into **Runtime Groups**. As a result, previously homogeneous runtimes in an organization can be grouped into runtime groups classified in a multitude of ways.
 
 Note: Runtime Groups will be an Enterprise tier feature only and therefore their usage limited to our Enterprise user base. Of this user base, we expect that a single organization will have on average around 6-12 runtime groups and no more than 100 or so at max.
@@ -57,42 +58,38 @@ Note: Runtime Groups will be an Enterprise tier feature only and therefore their
 - List of Runtimes
 ```
 
-
-
-## Service (Resource)
+### Service
+Unlike runtimes, services are already non-homogeneous so further classification for fine grained control is not necessary. Permissions to access each service can be assigned directly to a user or team.
+#### Service Attributes
+```
 - Service Name (Unique ID)
+```
 
+### KRNs (Kong Resource Names)
+KRNs are permissions to a particular resource that can be assigned to either a User or a Team.
 
-
-
-
-
-# KRNs (Kong Resource Names)
-- KRNs are permissions that can be assigned to either a User or a Team
-
-### Format
-`region`: `reg/us`, `reg/emea`, `reg/apac`
-
-`organization`: `org/org1`, `org/org2`, `org/org3`
-
-`resourceGroup`: `runtime-group/prod`, `runtime-group/dev`, `services/frontend`, `services/backend`
-
-`resource`: `runtime`, `service`
-
-`verb`: `create`, `read`, `update`, `delete`
+#### Format
 
 ```
 krn:region:organization:resourceGroup:resource!verb
 ```
 
-### Examples
+| Field | Definition | Example |
+|:--|:--|:--|
+| region | Regional Identification | `reg/us`, `reg/emea`, `reg/apac` |
+| organization | Organization Name | `org/org1`, `org/org2`, `org/org3` |
+| resourcePath | Path of the resources to grant access to | `runtime-group/prod`, `runtime-group/dev`, `services/frontend`, `services/backend` |
+| resourceType | Type of resource to access | `runtime`, `service` |
+| verb | Action allowed | `create`, `read`, `update`, `delete` |
+
+
+#### Examples
 ```python
 # Runtime Group KRNs
 - krn:reg/us:org/org1:runtime-group/prod:runtime!create
 - krn:reg/us:org/org1:runtime-group/prod:runtime/*!read
 - krn:reg/us:org/org1:runtime-group/prod:runtime/*!update
 - krn:reg/us:org/org1:runtime-group/prod:runtime/*!delete
-
 
 # Service KRNs
 - krn:reg/us:org/org1:services/frontend:service!create
@@ -101,4 +98,4 @@ krn:region:organization:resourceGroup:resource!verb
 - krn:reg/us:org/org1:services/frontend:service/*!delete
 ```
 
-## Enterprise Example:
+# Enterprise Example:
