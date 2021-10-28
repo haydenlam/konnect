@@ -1,16 +1,22 @@
+- [Konnect Advance Team Organization and Access Control](#konnect-advance-team-organization-and-access-control)
+  - [Today's State](#todays-state)
+      - [User](#user)
+      - [Runtimes](#runtimes)
+      - [Services](#services)
+  - [Problem Statement](#problem-statement)
+  - [Proposal](#proposal)
+    - [Users -> Teams](#users---teams)
+    - [Runtimes -> Runtime Groups](#runtimes---runtime-groups)
+    - [Service](#service)
+    - [KRNs (Kong Resource Names)](#krns-kong-resource-names)
+- [Enterprise Example (TBD)](#enterprise-example)
+
+___
 # Konnect Advance Team Organization and Access Control
 This document outlines a new method for Konnect administrators to manage access to Konnect resources. Primarily, individual users can be grouped into teams and individual teams will have permissions to access certain runtimes and services in Konnect.
-___
 
 ## Today's State
 Today, a Konnect organization is set up as follows:
-
-#### Runtimes
-- A single **Runtime Manager** lists all runtimes configured in an organization.
-- All runtimes created within an organization are homogeneous.
-
-#### Services
-- A single **Service Hub** catalog displays all services registered in an organization.
 
 #### User
 - There is a flat user list
@@ -22,6 +28,13 @@ Today, a Konnect organization is set up as follows:
     - Service Page Editor: Manage the documentation and specs for services.
     - Portal Admin: Manage all developer portal content.
     - Runtime Admin: Manage runtimes and manage global configs.
+
+#### Runtimes
+- A single **Runtime Manager** lists all runtimes configured in an organization.
+- All runtimes created within an organization are homogeneous.
+
+#### Services
+- A single **Service Hub** catalog displays all services registered in an organization.
 
 ### Problem Statement
 > Enterprise organizations would like more fine grained control over what resources users in Konnect have access to and be able to manage these controls at scale.
@@ -79,7 +92,7 @@ krn:region:organization:resourceGroup:resource!verb
 | region | Regional Identification | `reg/us`, `reg/emea`, `reg/apac` |
 | organization | Organization Name | `org/org1`, `org/org2`, `org/org3` |
 | resourcePath | Path of the resources to grant access to | `runtime-group/prod`, `runtime-group/dev`, `services/frontend`, `services/backend` |
-| resourceType | Type of resource to access | `runtime`, `service` |
+| resourceIds | Ids of resource grant access to | `runtime`, `service` |
 | verb | Action allowed | `create`, `read`, `update`, `delete` |
 
 
@@ -98,4 +111,7 @@ krn:region:organization:resourceGroup:resource!verb
 - krn:reg/us:org/org1:services/frontend:service/*!delete
 ```
 
+___
+
 # Enterprise Example:
+TBD
