@@ -79,10 +79,9 @@ Unlike runtimes, services are already non-homogeneous so further classification 
 ```
 
 ### KRNs (Kong Resource Names)
-KRNs are permissions to a particular resource that can be assigned to either a User or a Team.
+In order to identify what resources a user or team is authorized to access, a standardized **KRN** convention will be used to grant permissions. KRN will map an action to a resource/resources which can be assigned to either a user or team. The team will then be granted access to resources specified by the list of KRN permissions.
 
 #### Format
-
 ```
 krn:region:organization:resourceGroup:resource!verb
 ```
