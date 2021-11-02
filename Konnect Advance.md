@@ -112,5 +112,143 @@ krn:region:organization:resourceGroup:resource!verb
 
 ___
 
-# Enterprise Example:
-TBD
+# Enterprise Customization Example:
+
+### Scenario:
+ACME Bank is the sample organization. ACME bank consists of teams listed in the table below. Each of these teams interacts with their Konnect organization as per the description in the following table.
+
+| Team | Description |
+| :--- | :---------- |
+| Retail | The members of the Retail Konnect team are actively building Banking applications designed for the Retail business unit of the Bank that is concerned with the Bank's customer's day-to-day banking needs. These are applications such as the Bank's mobile application for consumers. |
+| Investment | The members of the Investment Konnect team are actively building Investment applications designed for providing trading services to the Bank's consumers. |
+| Operations | The members of the Operations team are responsible for deploying the services built by the Retail and Investment teams to the Bank's official Production environment. From a Konnect perspective, deployment to Production environment means that the Service is proxied on the appropriate set of Gateway data-planes (which are provisioned and managed by the Operations team) and available for usage by its clients. 
+
+The table below describes the scope of control each team has access to with respect to the Services and Runtime Groups from the Konnect perspective.
+
+| Team | Scope of Control (Services) | Scope of Control (Runtime Groups) |
+|:--|:--|:--|
+| Retail | Only the Retail Team should be able manage the lifecycle of the Retail services. | Only the Retail Team should have access to deploying services in the Retail Sandbox Runtime Group. |
+| Investment | Only the Investment Team should be able to manage the lifecycle of the Investment services. | Only the Investment Team should have access to deploying services in the Investment Sandbox Runtime Group. |
+| Operations | Operations Team should be able to view but not manage the services of both Retail and Investment teams. | Only the Operations Team should have access to deploying a service in the Production Runtime Group. |
+
+The goal of the steps outlined in this document is to enable a user with account ownership role (that is full root access to the Konnect account) to be able to setup the organization so that ACME Banks users can manage the lifecycle of their services according to their team membership and the types of services they are responsible for. 
+
+### 1. Creating Teams
+| Team | Description |
+|:--|:--|
+| retail-devs | The team of retail developers responsible for developing the retail application. |
+| investment-devs | The team of investment developers responsible for developing the investment application. |
+| dev-ops | The team developer operations responsible for deploying services into production. |
+
+```
+apiVersion: konnect.kong.io/v1
+kind: Team
+metadata:
+  name: retail-devs
+spec:
+  users:
+  permissions:
+```
+
+```
+apiVersion: konnect.kong.io/v1
+kind: Team
+metadata:
+  name: investment-devs
+spec:
+  users:
+  permissions:
+```
+
+```
+apiVersion: konnect.kong.io/v1
+kind: Team
+metadata:
+  name: dev-ops
+spec:
+  users:
+  permissions:
+```
+
+### 2. Setting Service Hub Permissions
+| Service | Description |
+|:--|:--|
+| retail-frontend | The frontend retail UI service managed by the Retail Team. |
+| retail-backend | The backend retail API service managed by the Retail Team. |
+| investment-frontend | The frontend investment UI service managed by the Investment Team. |
+| investment-backend | The backend investment API service managed by the Investment Team. |
+
+##### Permissions for `retail-devs` to manage the retail services
+```
+# Add a new service
+- krn:reg/us:org/acme-bank:services:service#create
+# Retrieve an existing service
+- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#read
+- krn:reg/us:org/acme-bank:services/retail-backend:service/*#read
+# Update an existing service
+- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#update
+- krn:reg/us:org/acme-bank:services/retail-backend:service/*#update
+# Remove an existing service
+- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#delete
+- krn:reg/us:org/acme-bank:services/retail-backend:service/*#delete
+```
+##### Permissions for `investment-devs` to manage the investment services
+```
+# Add a new service
+- krn:reg/us:org/acme-bank:services:service#create
+# Retrieve an existing service
+- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#read
+- krn:reg/us:org/acme-bank:services/investment-backend:service/*#read
+# Update an existing service
+- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#update
+- krn:reg/us:org/acme-bank:services/investment-backend:service/*#update
+# Remove an existing service
+- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#delete
+- krn:reg/us:org/acme-bank:services/investment-backend:service/*#delete
+```
+##### Permissions for `dev-ops`  to retrieve all the services
+```
+# Retrieve all existing service
+- krn:reg/us:org/acme-bank:services/*#read
+```
+
+### 3. Setting Runtime Manager Permissions
+| Runtime Group | Description |
+|:--|:--|
+| retail-sandbox-rg | The group of retail runtimes used for development and testing by the Retail Team. |
+| investment-sandbox-rg | The group of investment runtimes used for development and testing by the Investment Team. |
+| production-rg | The group of production runtimes used to expose ACME services to its customers. |
+
+##### Permissions for `retail-devs` to manage the Retail Sandbox.
+```
+# Add a new runtime
+- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime!create
+# Retrieve existing runtimes
+- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!read
+# Update existing runtimes
+- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!update
+# Delete existing runtimes
+- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!delete
+```
+##### Permissions for `investment-devs` to manage Investment Sandbox.
+```
+# Add a new runtime
+- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime!create
+# Retrieve existing runtimes
+- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!read
+# Update existing runtimes
+- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!update
+# Delete existing runtimes
+- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!delete
+```
+##### Permissions for `dev-ops`  to deploy services to production.
+```
+# Add a new runtime
+- krn:reg/us:org/org1:runtime-group/production-rg:runtime!create
+# Retrieve existing runtimes
+- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!read
+# Update existing runtimes
+- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!update
+# Delete existing runtimes
+- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!delete
+```
