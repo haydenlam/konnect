@@ -64,7 +64,7 @@ TBD: If a user is in multiple teams, is it possible there might be a permission 
 ### Runtimes -> Runtime Groups
 In order to gain fine grained control of runtime management access, runtimes need to be classified into **Runtime Groups**. As a result, previously homogeneous runtimes in an organization can be grouped into runtime groups classified in a multitude of ways.
 
-Note: Runtime Groups will be an Enterprise tier feature only and therefore their usage limited to our Enterprise user base. Of this user base, we expect that a single organization will have on average around 6-12 runtime groups and no more than 100 or so at max.
+Note: Runtime Groups will be an Enterprise tier feature only and therefor their usage limited to our Enterprise user base. Of this user base, we expect that a single organization will have on average around 6-12 runtime groups and no more than 100 or so at max.
 
 #### Runtime Group Attributes
 ```
@@ -196,7 +196,7 @@ Teams:
 ```
 
 ### 2. Setting Service Hub Permissions
-The following table describes the 4 Services that exists in the ACME organization. Each developement team is responsible for one Frontend Service and one Backend Service in their respective business unit.
+The following table describes the 4 Services that exists in the ACME organization. Each development team is responsible for one Frontend Service and one Backend Service in their respective business unit.
 
 | Service ID | Description |
 |:--|:--|
@@ -214,8 +214,8 @@ TeamPermissions:
     team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
     permission_id: xxxxxxxx-svcp-1111-xxxx-xxxxxxxxxxxx # services-create
     parameters:
-        region: us  # Subsequent param omitted for readability
-        orgID: ACME # Subsequent param omitted for readability
+        region: us  # Omitted in subsequent permissions for readability
+        orgID: ACME # Omitted in subsequent permissions for readability
   - id: 
     team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
     permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
@@ -254,8 +254,8 @@ TeamPermissions:
     team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
     permission_id: xxxxxxxx-svcp-1111-xxxx-xxxxxxxxxxxx # services-create
     parameters: 
-        region: us  # Subsequent param omitted for readability
-        orgID: ACME # Subsequent param omitted for readability
+        region: us  # Omitted in subsequent permissions for readability
+        orgID: ACME # Omitted in subsequent permissions for readability
   - id: 
     team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
     permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
@@ -307,7 +307,7 @@ TeamPermissions:
 ```
 
 ### 3. Setting Runtime Manager Permissions
-The following table describes the 3 Runtime Groups that exists in the ACME organization. Each developement team is responsible for one Sandbox Runtime Group while the dev-ops team is responsible for the Production Runtime Group.
+The following table describes the 3 Runtime Groups that exists in the ACME organization. Each development team is responsible for one Sandbox Runtime Group while the dev-ops team is responsible for the Production Runtime Group.
 
 | Runtime Group | Description |
 |:--|:--|
