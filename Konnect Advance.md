@@ -1,15 +1,16 @@
 - [Konnect Advance Team Organization and Access Control](#konnect-advance-team-organization-and-access-control)
   - [Today's State](#todays-state)
-      - [User](#user)
-      - [Runtimes](#runtimes)
-      - [Services](#services)
-  - [Problem Statement](#problem-statement)
+    - [Problem Statement](#problem-statement)
   - [Proposal](#proposal)
     - [Users -> Teams](#users---teams)
     - [Runtimes -> Runtime Groups](#runtimes---runtime-groups)
     - [Service](#service)
     - [KRNs (Kong Resource Names)](#krns-kong-resource-names)
-- [Enterprise Example (TBD)](#enterprise-example)
+- [Enterprise Customization Example:](#enterprise-customization-example)
+    - [Scenario](#scenario)
+    - [1. Creating Teams](#1-creating-teams)
+    - [2. Setting Service Hub Permissions](#2-setting-service-hub-permissions)
+    - [3. Setting Runtime Manager Permissions](#3-setting-runtime-manager-permissions)
 
 ___
 # Konnect Advance Team Organization and Access Control
@@ -88,28 +89,60 @@ krn:region:organization:resourceGroup:resource!verb
 
 | Field | Definition | Example |
 |:--|:--|:--|
-| region | Regional Identification | `reg/us`, `reg/emea`, `reg/apac` |
-| organization | Organization Name | `org/org1`, `org/org2`, `org/org3` |
-| resourcePath | Path of the resources to grant access to | `runtime-group/prod`, `runtime-group/dev`, `services/frontend`, `services/backend` |
-| resourceIds | Ids of resource grant access to | `runtime`, `service` |
-| verb | Action allowed | `create`, `read`, `update`, `delete` |
+| region | Regional Identification | `reg/{regionId}` |
+| organization | Organization Name | `org/{orgId}` |
+| resourcePath | Path of the resources to grant access to | `runtime-groups/{runtimeGroupId}`, `services/{serviceId}` |
+| action | Action allowed | `create`, `read`, `update`, `delete` |
 
 
 #### Examples
-```python
-# Runtime Group KRNs
-- krn:reg/us:org/org1:runtime-group/prod:runtime!create
-- krn:reg/us:org/org1:runtime-group/prod:runtime/*!read
-- krn:reg/us:org/org1:runtime-group/prod:runtime/*!update
-- krn:reg/us:org/org1:runtime-group/prod:runtime/*!delete
-
-# Service KRNs
-- krn:reg/us:org/org1:services/frontend:service!create
-- krn:reg/us:org/org1:services/frontend:service/*!read
-- krn:reg/us:org/org1:services/frontend:service/*!update
-- krn:reg/us:org/org1:services/frontend:service/*!delete
+```YAML
+# Runtime Group Permissions
+Permissions:
+  - id: xxxxxxxx-rtgp-1111-xxxx-xxxxxxxxxxxx
+    name: runtime-group-create
+    description: Permission to create Runtime Group
+    resource: krn:reg/{region}:org/{orgID}:runtime-groups
+    action: create
+  - id: xxxxxxxx-rtgp-2222-xxxx-xxxxxxxxxxxx
+    name: runtime-group-read
+    description: Permission to read Runtime Group
+    resource: krn:reg/{region}:org/{orgID}:runtime-groups/{id}
+    action: read
+  - id: xxxxxxxx-rtgp-3333-xxxx-xxxxxxxxxxxx
+    name: runtime-group-update
+    description: Permission to update Runtime Group
+    resource: krn:reg/{region}:org/{orgID}:runtime-groups/{id}
+    action: update
+  - id: xxxxxxxx-rtgp-4444-xxxx-xxxxxxxxxxxx
+    name: runtime-group-delete
+    description: Permission to delete Runtime Group
+    resource: krn:reg/{region}:org/{orgID}:runtime-groups/{id}
+    action: delete
+    
+# Service Permissions
+Permissions:
+  - id: xxxxxxxx-svcp-1111-xxxx-xxxxxxxxxxxx
+    name: services-create
+    description: Permission to create Services
+    resource: krn:reg/{region}:org/{orgID}:services
+    action: create
+  - id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx
+    name: services-read
+    description: Permission to read Services
+    resource: krn:reg/{region}:org/{orgID}:services/{id}
+    action: read
+  - id: xxxxxxxx-svcp-3333-xxxx-xxxxxxxxxxxx
+    name: services-update
+    description: Permission to update Services
+    resource: krn:reg/{region}:org/{orgID}:services/{id}
+    action: update
+  - id: xxxxxxxx-svcp-4444-xxxx-xxxxxxxxxxxx
+    name: services-delete
+    description: Permission to delete Services
+    resource: krn:reg/{region}:org/{orgID}:services/{id}
+    action: delete
 ```
-
 ___
 
 # Enterprise Customization Example:
@@ -140,79 +173,142 @@ The goal of the steps outlined in this document is to enable a user with account
 | investment-devs | The team of investment developers responsible for developing the investment application. |
 | dev-ops | The team developer operations responsible for deploying services into production. |
 
-```
-apiVersion: konnect.kong.io/v1
-kind: Team
-metadata:
-  name: retail-devs
-spec:
-  users:
-  permissions:
-```
-
-```
-apiVersion: konnect.kong.io/v1
-kind: Team
-metadata:
-  name: investment-devs
-spec:
-  users:
-  permissions:
-```
-
-```
-apiVersion: konnect.kong.io/v1
-kind: Team
-metadata:
-  name: dev-ops
-spec:
-  users:
-  permissions:
+``` YAML
+Teams:
+    - id: xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx
+      name: retail-devs
+      users:
+          - retail-dev-1
+          - retail-dev-2
+          - retail-dev-3
+    - id: xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx
+      name: investment-devs
+      users:
+          - investment-dev-1
+          - investment-dev-2
+          - investment-dev-3
+    - id: xxxxxxxx-team-3333-xxxx-xxxxxxxxxxxx
+      name: dev-ops
+      users:
+          - dev-ops-1
+          - dev-ops-2
+          - dev-ops-3
 ```
 
 ### 2. Setting Service Hub Permissions
-| Service | Description |
+The following table describes the 4 Services that exists in the ACME organization. Each developement team is responsible for one Frontend Service and one Backend Service in their respective business unit.
+
+| Service ID | Description |
 |:--|:--|
 | retail-frontend | The frontend retail UI service managed by the Retail Team. |
 | retail-backend | The backend retail API service managed by the Retail Team. |
 | investment-frontend | The frontend investment UI service managed by the Investment Team. |
 | investment-backend | The backend investment API service managed by the Investment Team. |
 
+Each dev teams should be able to create Services as well as manage Services they are responsible for. In addition, the dev-ops team will need to be able to read the Services of each dev team so that they can deploy the service into the production environment.
+
 ##### Permissions for `retail-devs` to manage the retail services
-```
-# Add a new service
-- krn:reg/us:org/acme-bank:services:service#create
-# Retrieve an existing service
-- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#read
-- krn:reg/us:org/acme-bank:services/retail-backend:service/*#read
-# Update an existing service
-- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#update
-- krn:reg/us:org/acme-bank:services/retail-backend:service/*#update
-# Remove an existing service
-- krn:reg/us:org/acme-bank:services/retail-frontend:service/*#delete
-- krn:reg/us:org/acme-bank:services/retail-backend:service/*#delete
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-1111-xxxx-xxxxxxxxxxxx # services-create
+    parameters:
+        region: us  # Subsequent param omitted for readability
+        orgID: ACME # Subsequent param omitted for readability
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters: 
+        id: retail-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters:
+        id: retail-backend
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-3333-xxxx-xxxxxxxxxxxx # services-update
+    parameters: 
+        id: retail-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-3333-xxxx-xxxxxxxxxxxx # services-update
+    parameters:
+        id: retail-backend
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-4444-xxxx-xxxxxxxxxxxx # services-delete
+    parameters: 
+        id: retail-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-svcp-4444-xxxx-xxxxxxxxxxxx # services-delete
+    parameters:
+        id: retail-backend
 ```
 ##### Permissions for `investment-devs` to manage the investment services
-```
-# Add a new service
-- krn:reg/us:org/acme-bank:services:service#create
-# Retrieve an existing service
-- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#read
-- krn:reg/us:org/acme-bank:services/investment-backend:service/*#read
-# Update an existing service
-- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#update
-- krn:reg/us:org/acme-bank:services/investment-backend:service/*#update
-# Remove an existing service
-- krn:reg/us:org/acme-bank:services/investment-frontend:service/*#delete
-- krn:reg/us:org/acme-bank:services/investment-backend:service/*#delete
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-1111-xxxx-xxxxxxxxxxxx # services-create
+    parameters: 
+        region: us  # Subsequent param omitted for readability
+        orgID: ACME # Subsequent param omitted for readability
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters:
+        id: investment-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters:
+        id: investment-backend
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-3333-xxxx-xxxxxxxxxxxx # services-update
+    parameters:
+        id: investment-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-3333-xxxx-xxxxxxxxxxxx # services-update
+    parameters:
+        id: investment-backend
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-4444-xxxx-xxxxxxxxxxxx # services-delete
+    parameters:
+        id: investment-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-svcp-4444-xxxx-xxxxxxxxxxxx # services-delete
+    parameters:
+        id: investment-backend
 ```
 ##### Permissions for `dev-ops`  to retrieve all the services
-```
-# Retrieve all existing service
-- krn:reg/us:org/acme-bank:services/*#read
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-3333-xxxx-xxxxxxxxxxxx # dev-ops
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters:
+        region: us
+        orgID: ACME
+        id: retail-frontend
+  - id: 
+    team_id:       xxxxxxxx-team-3333-xxxx-xxxxxxxxxxxx # dev-ops
+    permission_id: xxxxxxxx-svcp-2222-xxxx-xxxxxxxxxxxx # services-read
+    parameters:
+        region: us 
+        orgID: ACME
+        id: investment-frontend
 ```
 
 ### 3. Setting Runtime Manager Permissions
+The following table describes the 3 Runtime Groups that exists in the ACME organization. Each developement team is responsible for one Sandbox Runtime Group while the dev-ops team is responsible for the Production Runtime Group.
+
 | Runtime Group | Description |
 |:--|:--|
 | retail-sandbox-rg | The group of retail runtimes used for development and testing by the Retail Team. |
@@ -220,35 +316,35 @@ spec:
 | production-rg | The group of production runtimes used to expose ACME services to its customers. |
 
 ##### Permissions for `retail-devs` to manage the Retail Sandbox.
-```
-# Add a new runtime
-- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime!create
-# Retrieve existing runtimes
-- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!read
-# Update existing runtimes
-- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!update
-# Delete existing runtimes
-- krn:reg/us:org/org1:runtime-group/retail-sandbox-rg:runtime/*!delete
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-1111-xxxx-xxxxxxxxxxxx # retail-devs
+    permission_id: xxxxxxxx-rtgp-3333-xxxx-xxxxxxxxxxxx # runtime-group-update
+    parameters:
+        region: us
+        orgID: ACME
+        id: retail-sandbox-rg
 ```
 ##### Permissions for `investment-devs` to manage Investment Sandbox.
-```
-# Add a new runtime
-- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime!create
-# Retrieve existing runtimes
-- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!read
-# Update existing runtimes
-- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!update
-# Delete existing runtimes
-- krn:reg/us:org/org1:runtime-group/investment-sandbox-rg:runtime/*!delete
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-2222-xxxx-xxxxxxxxxxxx # investment-devs
+    permission_id: xxxxxxxx-rtgp-3333-xxxx-xxxxxxxxxxxx # runtime-group-update
+    parameters:
+        region: us
+        orgID: ACME
+        id: investment-sandbox-rg
 ```
 ##### Permissions for `dev-ops`  to deploy services to production.
-```
-# Add a new runtime
-- krn:reg/us:org/org1:runtime-group/production-rg:runtime!create
-# Retrieve existing runtimes
-- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!read
-# Update existing runtimes
-- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!update
-# Delete existing runtimes
-- krn:reg/us:org/org1:runtime-group/production-rg:runtime/*!delete
+```YAML
+TeamPermissions:
+  - id: 
+    team_id:       xxxxxxxx-team-3333-xxxx-xxxxxxxxxxxx # dev-ops
+    permission_id: xxxxxxxx-rtgp-3333-xxxx-xxxxxxxxxxxx # runtime-group-update
+    parameters:
+        region: us
+        orgID: ACME
+        id: production-rg
 ```
